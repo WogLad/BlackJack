@@ -12,8 +12,12 @@ interface Card {
 function App() {
   const [dict, setDict] = useState< Card | null >(null);
 
+  function getNewCard() {
+    socket.emit("getNewCard");
+  }
+
   useEffect(() => {
-    socket.on('dictionary', (data) => {
+    socket.on('updateNewCard', (data) => {
       setDict(data);
     });
   }, []);
@@ -29,7 +33,7 @@ function App() {
         )}
       </div>
       
-      <button style={{marginRight: "20px"}}>Hit</button>
+      <button style={{marginRight: "20px"}} onClick={(e) => {getNewCard()}}>Hit</button>
       <button>Stay</button>
 
     </div>

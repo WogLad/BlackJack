@@ -20,8 +20,10 @@ function getRandomCard() {
 io.on('connection', (socket) => {
   console.log('A user connected.');
 
-  // Send a dictionary to the client
-  socket.emit('dictionary', getRandomCard());
+  // Send a random card to the client
+  socket.on("getNewCard", () => {
+    socket.emit('updateNewCard', getRandomCard());
+  });
 
   socket.on('disconnect', () => {
     console.log('A user disconnected.');
