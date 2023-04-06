@@ -17,16 +17,47 @@ function getRandomCard() {
   return { symbol: randomSymbol, digit: randomDigit };
 }
 
+const players = {/* {playerSocketID: currentRoundPoints} */};
+
+const digitToScore = {
+  "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, "j": 10, "q": 10, "k": 10, "a": 1,
+};
+
 io.on('connection', (socket) => {
   console.log('A user connected.');
+  players[socket.id] = 0;
 
-  // Send a random card to the client
   socket.on("getNewCard", () => {
-    socket.emit('updateNewCard', getRandomCard());
+    const randomCard = getRandomCard();
+    socket.emit('updateNewCard', randomCard);
+
+    if (randomCard.digit == "a" && ((21 - players[socket.id]) >= 11)) {
+      players[socket.id] += 11;
+    }
+    else {
+      players[socket.id] += digitToScore[randomCard.digit];
+    }
+
+    if (players[socket.id] > 21) {
+      players[socket.id] = -1;
+    }
+    
+    socket.emit("setScore", players[socket.id]);
+  });
+
+  socket.on("turnEnd", () => {
+    console.log(`The player ended his turn with a score of ${players[socket.id]}.`);
+  });
+
+  socket.on("restartGame", () => {
+    for (var i in players) {
+      players[i] = 0;
+    }
   });
 
   socket.on('disconnect', () => {
     console.log('A user disconnected.');
+    delete players[socket.id];
   });
 });
 

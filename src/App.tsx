@@ -10,31 +10,44 @@ interface Card {
 }
 
 function App() {
-  const [dict, setDict] = useState< Card | null >(null);
+  const [card, setCard] = useState< Card | null >(null);
+  const [personalScore, setPersonalScore] = useState<number | "STAYED" | "BUST">(0);
+  const [isPlaying, setIsPlaying] = useState(true);
 
-  function getNewCard() {
-    socket.emit("getNewCard");
-  }
+  socket.on('updateNewCard', (data) => {
+    setCard(data);
+  });
 
-  useEffect(() => {
-    socket.on('updateNewCard', (data) => {
-      setDict(data);
-    });
-  }, []);
+  socket.on("setScore", (score) => {
+    if (score == -1) {
+      setPersonalScore("BUST");
+      setIsPlaying(false);
+      return;
+    }
+    else if (score == 21) {
+      setIsPlaying(false);
+    }
+    setPersonalScore(score);
+  });
 
   return (
     <div className="App">
+      {/* TODO: Design the component for the card */}
       <div>
-        {dict && (
+        {card && (
           <div style={{fontWeight: "bolder"}}>
-            <p>Digit: {dict.digit}</p>
-            <p>Symbol: {dict.symbol}</p>
+            <p>Digit: {card.digit}</p>
+            <p>Symbol: {card.symbol}</p>
           </div>
         )}
       </div>
       
-      <button style={{marginRight: "20px"}} onClick={(e) => {getNewCard()}}>Hit</button>
-      <button>Stay</button>
+      <button disabled={!isPlaying} style={{marginRight: "20px"}} onClick={(e) => {if (isPlaying) {socket.emit("getNewCard");}}}>Hit</button>
+      <button onClick={(e) => {socket.emit("turnEnd"); setPersonalScore("STAYED"); setIsPlaying(false);}}>Stay</button>
+
+      <div>
+        <p>Score: {personalScore}</p>
+      </div>
 
     </div>
   )
