@@ -17,41 +17,54 @@ function getRandomCard() {
   return { symbol: randomSymbol, digit: randomDigit };
 }
 
-const players = {/* {playerSocketID: currentRoundPoints} */};
+const players = {/* {playerSocketID: {username, currentRoundPoints}} */};
 
 const digitToScore = {
   "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, "j": 10, "q": 10, "k": 10, "a": 1,
 };
 
 io.on('connection', (socket) => {
-  console.log('A user connected.');
-  players[socket.id] = 0;
+  players[socket.id] = {username: "", score: 0};
+
+  socket.on("setUsername", (username) => {
+    players[socket.id].username = username;
+    console.log(`${username} connected.`);
+  });
 
   socket.on("getNewCard", () => {
     const randomCard = getRandomCard();
     socket.emit('updateNewCard', randomCard);
 
-    if (randomCard.digit == "a" && ((21 - players[socket.id]) >= 11)) {
-      players[socket.id] += 11;
+    if (randomCard.digit == "a" && ((21 - players[socket.id].score) >= 11)) {
+      players[socket.id].score += 11;
     }
     else {
-      players[socket.id] += digitToScore[randomCard.digit];
+      players[socket.id].score += digitToScore[randomCard.digit];
     }
 
-    if (players[socket.id] > 21) {
-      players[socket.id] = -1;
+    if (players[socket.id].score > 21) {
+      players[socket.id].score = -1;
     }
     
-    socket.emit("setScore", players[socket.id]);
+    socket.emit("setScore", players[socket.id].score);
+  });
+
+  socket.on("getPlayerScores", () => {
+    var playerScores = {};
+    for (var i in players) {
+      playerScores[players[i].username] = players[i].score
+    }
+    socket.emit("setPlayerScores", playerScores);
   });
 
   socket.on("turnEnd", () => {
-    console.log(`The player ended his turn with a score of ${players[socket.id]}.`);
+    // console.log(`The player ended his turn with a score of ${players[socket.id]}.`);
+    console.log(players);
   });
 
   socket.on("restartGame", () => {
     for (var i in players) {
-      players[i] = 0;
+      players[i].score = 0;
     }
   });
 
