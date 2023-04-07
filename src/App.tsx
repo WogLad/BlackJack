@@ -1,10 +1,11 @@
 import './App.css'
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import io from 'socket.io-client';
+import { CardComponent } from './Card';
 
 const socket = io('http://localhost:3000');
 
-interface Card {
+export interface Card {
   digit: string;
   symbol: string;
 }
@@ -14,7 +15,7 @@ function App() {
   const [personalScore, setPersonalScore] = useState<number | "STAYED" | "BUST">(0);
   const [isPlaying, setIsPlaying] = useState(true);
 
-  socket.on('updateNewCard', (data) => {
+  socket.on('updateNewCard', (data: Card) => {
     setCard(data);
   });
 
@@ -32,15 +33,10 @@ function App() {
 
   return (
     <div className="App">
-      {/* TODO: Design the component for the card */}
-      <div>
-        {card && (
-          <div style={{fontWeight: "bolder"}}>
-            <p>Digit: {card.digit}</p>
-            <p>Symbol: {card.symbol}</p>
-          </div>
-        )}
-      </div>
+      {/* DONE: Design the component for the card */}
+      {card && (
+        <CardComponent digit={card.digit} symbol={card.symbol} />
+      )}
       
       <button disabled={!isPlaying} style={{marginRight: "20px"}} onClick={(e) => {if (isPlaying) {socket.emit("getNewCard");}}}>Hit</button>
       <button onClick={(e) => {socket.emit("turnEnd"); setPersonalScore("STAYED"); setIsPlaying(false);}}>Stay</button>
