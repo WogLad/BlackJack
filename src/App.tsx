@@ -35,14 +35,14 @@ function App() {
     setPersonalScore(score);
   });
 
-  socket.on("setPlayerScores", (playerScores) => {
+  socket.on("setPlayerScores", (scores) => {
     var text: string = "";
     var i = 1;
-    for (var username in playerScores) {
-      text += `<div>${i}. ${username} - ${playerScores[username]}</div>`;
+    for (var username in scores) {
+      text += `${i}. ${username} - ${scores[username]}\n`;
       i++;
     }
-    setPlayerScoresText(text);
+    (document.getElementById("scoreboardText") as HTMLDivElement).innerText = text;
   });
 
   return (
@@ -71,9 +71,7 @@ function App() {
       }}>
         <h1 style={{fontWeight: "bolder"}}><u>Scoreboard</u></h1>
         
-        <div style={{overflow: "scroll", height: "80%", width: "95%", border: "1px dashed white", margin: "auto", fontWeight: "bold"}}>
-          {playerScoresText}
-        </div>
+        <div id='scoreboardText' style={{overflow: "scroll", height: "80%", width: "95%", border: "1px dashed white", margin: "auto", fontWeight: "bold", fontSize: "1.3rem", textAlign: "left", marginLeft: "0 20px"}}></div>
       </div>
     </div>
   )
