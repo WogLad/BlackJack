@@ -54,7 +54,7 @@ io.on('connection', (socket) => {
     for (var i in players) {
       playerScores[players[i].username] = players[i].score
     }
-    socket.emit("setPlayerScores", playerScores);
+    io.emit("setPlayerScores", playerScores);
   });
 
   socket.on("turnEnd", () => {
