@@ -71,7 +71,7 @@ function App() {
       }}>
         <h1 style={{fontWeight: "bolder"}}><u>Scoreboard</u></h1>
         
-        <div id='scoreboardText' style={{overflow: "scroll", height: "80%", width: "95%", border: "1px dashed white", margin: "auto", fontWeight: "bold", fontSize: "1.3rem", textAlign: "left", marginLeft: "0 20px"}}></div>
+        <div id='scoreboardText' style={{overflow: "scroll", height: "80%", width: "95%", margin: "auto", fontWeight: "bold", fontSize: "1.3rem", textAlign: "left", marginLeft: "0 20px"}}></div>
       </div>
     </div>
   )
