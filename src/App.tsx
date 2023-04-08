@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import io from 'socket.io-client';
 import { CardComponent } from './Card';
 
-const socket = io('http://localhost:3000');
+const socket = io(`http://${location.hostname}:3000`);
 
 const username = prompt("Enter your name")?.trim();
 socket.emit("setUsername", username);
